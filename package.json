@@ -1,0 +1,34 @@
+{
+  "name": "cse-quiz-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered CSE Quiz & Assessment Platform - Production Monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "db:generate": "cd apps/api && pnpm prisma generate",
+    "db:push": "cd apps/api && pnpm prisma db push",
+    "db:studio": "cd apps/api && pnpm prisma studio",
+    "db:migrate": "cd apps/api && pnpm prisma migrate dev"
+  },
+  "devDependencies": {
+    "@turbo/gen": "^2.3.3",
+    "prettier": "^3.2.5",
+    "turbo": "^2.3.3",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.4"
+}
