@@ -3,8 +3,8 @@ import { QuestionService } from './question.service';
 import { QuestionController } from './question.controller';
 
 @Module({
-  controllers: [QuestionController],
-  providers: [QuestionService],
-  exports: [QuestionService],
+    controllers: [QuestionController],
+    providers: [QuestionService],
+    exports: [QuestionService],
 })
-export class QuestionModule {}
+export class QuestionModule { }
