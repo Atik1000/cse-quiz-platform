@@ -1,0 +1,144 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USER MODEL ============
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quizAttempts QuizAttempt[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+// ============ CATEGORY MODEL ============
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  children Category[] @relation("CategoryToCategory")
+  questions Question[]
+  quizzes   Quiz[]
+
+  @@map("categories")
+}
+
+// ============ QUESTION MODEL ============
+model Question {
+  id            String           @id @default(uuid())
+  question      String           @db.Text
+  options       String[]         // Array of options for MCQ
+  correctAnswer String
+  explanation   String           @db.Text
+  difficulty    Difficulty
+  type          QuestionType
+  categoryId    String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  quizQuestions QuizQuestion[]
+
+  @@index([categoryId])
+  @@index([difficulty])
+  @@map("questions")
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QuestionType {
+  MCQ
+  SHORT_ANSWER
+  CODING
+}
+
+// ============ QUIZ MODEL ============
+model Quiz {
+  id              String   @id @default(uuid())
+  title           String
+  categoryId      String
+  difficulty      String   // Can be EASY, MEDIUM, HARD, or MIX
+  totalQuestions  Int
+  timeLimit       Int      // in minutes
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  quizQuestions QuizQuestion[]
+  attempts      QuizAttempt[]
+
+  @@index([categoryId])
+  @@map("quizzes")
+}
+
+// ============ QUIZ QUESTION (Join Table) ============
+model QuizQuestion {
+  id         String   @id @default(uuid())
+  quizId     String
+  questionId String
+  order      Int
+  createdAt  DateTime @default(now())
+
+  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, questionId])
+  @@index([quizId])
+  @@map("quiz_questions")
+}
+
+// ============ QUIZ ATTEMPT MODEL ============
+model QuizAttempt {
+  id             String      @id @default(uuid())
+  userId         String
+  quizId         String
+  score          Float       @default(0)
+  totalQuestions Int
+  answers        Json        // Array of {questionId, userAnswer, isCorrect, timeSpent}
+  status         QuizStatus  @default(NOT_STARTED)
+  startedAt      DateTime    @default(now())
+  completedAt    DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([quizId])
+  @@index([status])
+  @@map("quiz_attempts")
+}
+
+enum QuizStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
