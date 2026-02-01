@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 // ============ ENUMS ============
 export enum UserRole {
     ADMIN = 'ADMIN',

@@ -16,7 +16,7 @@ export class AdminService {
         // Validate category
         const category = await this.categoryService.findOne(data.categoryId);
 
-        let subcategory = null;
+        let subcategory: typeof category | null = null;
         if (data.subcategoryId) {
             subcategory = await this.categoryService.findOne(data.subcategoryId);
         }

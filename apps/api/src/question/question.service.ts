@@ -121,7 +121,26 @@ export class QuestionService {
         difficulty: QuestionDifficulty | 'MIX',
         limit: number
     ) {
-        const where: any = { categoryId };
+        // Get the category and its subcategories
+        const category = await this.prisma.category.findUnique({
+            where: { id: categoryId },
+            include: {
+                children: true,
+            },
+        });
+
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+
+        // Include the selected category and all its children
+        const categoryIds = [categoryId, ...category.children.map(c => c.id)];
+
+        const where: any = {
+            categoryId: {
+                in: categoryIds,
+            },
+        };
 
         if (difficulty !== 'MIX') {
             where.difficulty = difficulty;
@@ -129,7 +148,7 @@ export class QuestionService {
 
         return this.prisma.question.findMany({
             where,
-            take: limit,
+            take: limit * 2, // Get more than needed to ensure we have enough after shuffling
             orderBy: {
                 createdAt: 'desc',
             },

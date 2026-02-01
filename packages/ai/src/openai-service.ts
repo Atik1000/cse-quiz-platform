@@ -1,7 +1,6 @@
 import OpenAI from 'openai';
 import {
     GeneratedQuestion,
-    QuestionDifficulty,
     QuestionType,
     generatedQuestionSchema,
 } from '@cse-quiz/shared';

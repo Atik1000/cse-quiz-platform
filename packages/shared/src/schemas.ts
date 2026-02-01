@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { QuestionDifficulty, QuestionType, UserRole } from './types';
+import { QuestionDifficulty, QuestionType } from './types';
 
 // ============ AUTH SCHEMAS ============
 export const loginSchema = z.object({

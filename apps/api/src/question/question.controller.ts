@@ -32,7 +32,7 @@ export class QuestionController {
         @Query('difficulty') difficulty?: QuestionDifficulty
     ) {
         return this.questionService.findAll(
-            { page: page || 1, limit: limit || 10 },
+            { page: page || 1, limit: limit || 10, sortOrder: 'desc' as 'asc' | 'desc' },
             categoryId,
             difficulty
         );

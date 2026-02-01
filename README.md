@@ -37,12 +37,25 @@ cse-quiz-platform/
 ### Installation
 
 ```bash
+# Clone the repository
+git clone <your-repo-url>
+cd cse-quiz-platform
+
+# Run automated setup
+chmod +x setup.sh
+./setup.sh
+
+# Or manually:
 # Install dependencies
 pnpm install
 
 # Setup environment variables
 cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env
+cp apps/web/.env.example apps/web/.env.local
+
+# Build shared packages
+pnpm --filter @cse-quiz/shared build
+pnpm --filter @cse-quiz/ai build
 
 # Generate Prisma client
 pnpm db:generate
@@ -50,9 +63,21 @@ pnpm db:generate
 # Push database schema
 pnpm db:push
 
+# Seed database with sample data
+cd apps/api && pnpm prisma:seed && cd ../..
+
 # Run development servers
 pnpm dev
 ```
+
+**Default Login Credentials:**
+- Admin: `admin@csequiz.com` / `admin123`
+- User: `user@csequiz.com` / `user123`
+
+### Access Points
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:4000/api
+- Prisma Studio: `pnpm db:studio`
 
 ### Environment Setup
 
@@ -100,12 +125,22 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 ## 📦 Scripts
 
 ```bash
-pnpm dev          # Start development servers
+# Development
+pnpm dev          # Start all development servers
 pnpm build        # Build all applications
 pnpm start        # Start production servers
 pnpm lint         # Lint all packages
+pnpm format       # Format code with Prettier
+
+# Database
+pnpm db:generate  # Generate Prisma client
+pnpm db:push      # Push schema to database
 pnpm db:studio    # Open Prisma Studio
 pnpm db:migrate   # Run database migrations
+cd apps/api && pnpm prisma:seed  # Seed database
+
+# Cleanup
+pnpm clean        # Remove all build artifacts and node_modules
 ```
 
 ## 🚢 Deployment
