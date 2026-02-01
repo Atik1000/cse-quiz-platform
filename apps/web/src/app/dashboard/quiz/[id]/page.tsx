@@ -76,6 +76,27 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
                 answers: formattedAnswers,
             });
 
+            // Store result in localStorage for the result page
+            const resultData = {
+                attemptId: params.id,
+                score: response.data.score || 0,
+                totalQuestions: quiz.questions.length,
+                correctAnswers: response.data.correctAnswers || 0,
+                incorrectAnswers: response.data.incorrectAnswers || 0,
+                timeTaken: quiz.quiz.timeLimit * 60 - timeRemaining,
+                questions: quiz.questions.map((q: any, index: number) => ({
+                    id: q.id,
+                    question: q.question,
+                    options: q.options || [],
+                    correctAnswer: q.correctAnswer,
+                    userAnswer: answers[q.id] || '',
+                    isCorrect: answers[q.id] === q.correctAnswer,
+                    explanation: q.explanation || 'No explanation provided',
+                    difficulty: q.difficulty,
+                })),
+            };
+
+            localStorage.setItem(`result_${params.id}`, JSON.stringify(resultData));
             localStorage.removeItem(`quiz_${params.id}`);
             router.push(`/dashboard/quiz/result/${params.id}`);
         } catch (error: any) {
@@ -134,8 +155,8 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
                             <label
                                 key={index}
                                 className={`block p-4 border-2 rounded-lg cursor-pointer transition ${answers[question.id] === option
-                                        ? 'border-primary-600 bg-primary-50'
-                                        : 'border-gray-200 hover:border-primary-300'
+                                    ? 'border-primary-600 bg-primary-50'
+                                    : 'border-gray-200 hover:border-primary-300'
                                     }`}
                             >
                                 <input
